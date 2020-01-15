@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-# This is the base script that will install a mostly barebone Arch Linux system.
-# Installed packages are base, base-devel, openssh, mlocate and reflector.
-# The bootloader that will be installed is rEFInd.
-#
-# WARNING: This script will wipe whatever drive is mapped to '/dev/sda'.
-# So make sure that the only drive connected, is the drive you want to install Arch Linux to.
 set -e
 set -u
 
@@ -25,15 +19,6 @@ DAEMONS=""
 # Software Packages
 EXTRAPKG="base base-devel refind-efi"
 OPTIONALDEP="bash-completion"
-
-# Required
-# base			    = Base linux system packages group				    = https://www.archlinux.org/groups/x86_64/base/
-# base-devel	    = Base packages to compile packages from aur	    = https://www.archlinux.org/groups/x86_64/base-devel/
-# refind-efi        = UEFI Boot Manager - Built with GNU-EFI libs       = https://www.archlinux.org/packages/extra/x86_64/refind-efi/
-
-# Optional
-# bash-completion	= Programmable completion for the bash shell	    = https://www.archlinux.org/packages/extra/any/bash-completion/
-
 
 ###########
 ## Setup ##
@@ -66,7 +51,7 @@ requestPackages()
 		if [ "$pkg" = 1 ]; then
 		    # openssh		= Free version of the SSH connectivity tools            = https://www.archlinux.org/packages/core/x86_64/openssh/
 			EXTRAPKG="$EXTRAPKG openssh"
-			DAEMONS="$DAEMONS sshd.socket"
+			DAEMONS="$DAEMONS sshd.service"
 
 		elif [ "$pkg" = 2 ]; then
 		    # reflector		= Retrieve and filter the latest Pacman mirror list		= https://www.archlinux.org/packages/community/any/reflector/
@@ -173,51 +158,6 @@ if [[ -n $(lspci | grep -i "VGA compatible controller: NVIDIA Corporation") ]]; 
     EXTRAPKG="$EXTRAPKG nvidia"
     DECODER='vdpau'
 fi
-
-
-####################
-## Virtualization ##
-####################
-
-if systemd-detect-virt -q; then
-    VM=$(systemd-detect-virt)
-
-    # Check for a VMware virtual machine
-    if [ "$VM" == "vmware" ]; then
-        # open-vm-tools		= open-vm-tools are the open source implementation of VMware Tools		= https://www.archlinux.org/packages/community/x86_64/open-vm-tools/
-        EXTRAPKG="$EXTRAPKG open-vm-tools"
-        DAEMONS="$DAEMONS vmtoolsd.service"
-
-        # Required Kernel Drivers
-        # vmw_balloon
-        # vmw_pvscsi
-        # vmw_vmci
-        # vmwgfx
-        # vmxnet3
-
-        # Esxi Hypervisor drivers
-        # vsock
-        # vmw_vsock_vmci_transport
-
-    # Check for a Virtuabox virtual machine
-    elif [ "$VM" == "oracle" ]; then
-        # virtualbox-guest-utils	= VirtualBox Guest userspace utilities		= https://www.archlinux.org/packages/community/x86_64/virtualbox-guest-utils/
-        EXTRAPKG="$EXTRAPKG virtualbox-guest-utils"
-        OPTIONALDEP="$OPTIONALDEP virtualbox-guest-modules-arch"
-        DAEMONS="$DAEMONS vboxservice.service"
-
-    # Check if system is using an intel CPU and if so, install intel-ucode
-    elif [ "$VM" == "qemu" ] || [ "$VM" == "kvm" ]; then
-        # qemu-guest-agent		= QEMU Guest Agent		= https://www.archlinux.org/packages/extra/x86_64/qemu-guest-agent/
-        EXTRAPKG="$EXTRAPKG qemu-guest-agent"
-        DAEMONS="$DAEMONS qemu-ga.service"
-    fi
-
-elif [[ -n $(cat /proc/cpuinfo | grep -i "GenuineIntel") ]]; then
-	EXTRAPKG="$EXTRAPKG intel-ucode"
-	# intel-ucode				= Microcode update files for Intel CPUs			= https://www.archlinux.org/packages/extra/any/intel-ucode/
-fi
-
 
 #####################
 # Pre Configuration #
