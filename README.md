@@ -51,7 +51,7 @@ Download the latest ISO from [archlinux.org], then boot into the live ISO(Archis
 Once the installer boots, run the following commands to download and execute the install script.
 
 ```sh
-$ curl -SLO https://github.com/willforde/arch-installer/archive/master.tar.gz
+$ curl -SLO https://github.com/fordetek/arch-installer/archive/master.tar.gz
 $ tar zxf master.tar.gz && cd arch-installer-master
 $ sh base.sh
 ```

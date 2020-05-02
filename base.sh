@@ -23,7 +23,7 @@ KEYMAP="uk"
 DAEMONS=""
 
 # Software Packages
-EXTRAPKG="base base-devel refind-efi"
+EXTRAPKG="base base-devel refind-efi" # TODO: check if refind has changed package name
 OPTIONALDEP="bash-completion"
 
 # Required
